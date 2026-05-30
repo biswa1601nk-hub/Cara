@@ -364,7 +364,9 @@ const products = [
  */
 function renderStars(baseRating, productId) {
   // Load user's saved rating if it exists, else use base rating
-  const savedRating = parseFloat(localStorage.getItem('userRating_' + productId));
+  const savedRating = parseFloat(
+    localStorage.getItem('userRating_' + productId)
+  );
   const displayRating = !isNaN(savedRating) ? savedRating : baseRating;
 
   const starDiv = document.createElement('div');
@@ -402,16 +404,18 @@ function renderStars(baseRating, productId) {
 
   // Reset highlight on mouse leave
   starDiv.addEventListener('mouseleave', () => {
-    const currentRating = parseFloat(localStorage.getItem('userRating_' + productId)) || baseRating;
+    const currentRating =
+      parseFloat(localStorage.getItem('userRating_' + productId)) || baseRating;
     updateStarDisplay(starDiv, currentRating);
   });
 
   // Numeric rating text
   const ratingText = document.createElement('span');
   ratingText.className = 'rating-value';
-  ratingText.textContent = displayRating % 1 === 0
-    ? displayRating.toFixed(1)
-    : displayRating.toString();
+  ratingText.textContent =
+    displayRating % 1 === 0
+      ? displayRating.toFixed(1)
+      : displayRating.toString();
   starDiv.appendChild(ratingText);
 
   return starDiv;
@@ -493,7 +497,11 @@ function renderProducts(containerId, list) {
     try {
       return JSON.parse(localStorage.getItem(key) || fallback);
     } catch {
-      try { return JSON.parse(fallback); } catch { return []; }
+      try {
+        return JSON.parse(fallback);
+      } catch {
+        return [];
+      }
     }
   }
 
@@ -623,17 +631,23 @@ function renderProducts(containerId, list) {
       let wishlist = safeParseJSON('wishlist');
       const exists = wishlist.find((i) => i.name === productName);
       if (!exists) {
-        wishlist.push({ name: productName, price: productPrice, image: productImage });
+        wishlist.push({
+          name: productName,
+          price: productPrice,
+          image: productImage,
+        });
         wishlistBtn.classList.add('active');
         wishlistBtn.innerHTML = '<i class="ri-heart-fill"></i>';
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
-        if (typeof showToast === 'function') showToast(productName + ' added to wishlist', 'success');
+        if (typeof showToast === 'function')
+          showToast(productName + ' added to wishlist', 'success');
       } else {
         wishlist = wishlist.filter((i) => i.name !== productName);
         wishlistBtn.classList.remove('active');
         wishlistBtn.innerHTML = '<i class="ri-heart-line"></i>';
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
-        if (typeof showToast === 'function') showToast(productName + ' removed from wishlist', 'info');
+        if (typeof showToast === 'function')
+          showToast(productName + ' removed from wishlist', 'info');
       }
     });
     actionBar.appendChild(wishlistBtn);
@@ -701,9 +715,15 @@ function filterProducts() {
   const query = input ? input.value.trim().toLowerCase() : '';
   const category = categorySelect ? categorySelect.value : 'all';
   const sortValue = sortSelect ? sortSelect.value : 'default';
-  const brandValue = brandSelect ? brandSelect.value.toLowerCase().trim() : 'all';
-  const colorValue = colorSelect ? colorSelect.value.toLowerCase().trim() : 'all';
-  const styleValue = styleSelect ? styleSelect.value.toLowerCase().trim() : 'all';
+  const brandValue = brandSelect
+    ? brandSelect.value.toLowerCase().trim()
+    : 'all';
+  const colorValue = colorSelect
+    ? colorSelect.value.toLowerCase().trim()
+    : 'all';
+  const styleValue = styleSelect
+    ? styleSelect.value.toLowerCase().trim()
+    : 'all';
 
   let filteredProducts = products.filter((product) => {
     const matchesCategory = category === 'all' || product.category === category;
@@ -716,9 +736,14 @@ function filterProducts() {
 
   // Apply brand/color/style filters
   filteredProducts = filteredProducts.filter((product) => {
-    const matchesBrand = brandValue === 'all' || product.brand.toLowerCase() === brandValue;
-    const matchesColor = colorValue === 'all' || (product.color && product.color.toLowerCase() === colorValue);
-    const matchesStyle = styleValue === 'all' || (product.style && product.style.toLowerCase() === styleValue);
+    const matchesBrand =
+      brandValue === 'all' || product.brand.toLowerCase() === brandValue;
+    const matchesColor =
+      colorValue === 'all' ||
+      (product.color && product.color.toLowerCase() === colorValue);
+    const matchesStyle =
+      styleValue === 'all' ||
+      (product.style && product.style.toLowerCase() === styleValue);
     return matchesBrand && matchesColor && matchesStyle;
   });
 
@@ -772,13 +797,40 @@ function attachSearchListeners() {
 }
 
 function addToCart(name, price, img, quantity, size) {
-let cart = safeParseJSON('productsInCart');
-    } else if (e.target.classList.contains('fa-cart-plus') || e.target.classList.contains('ri-add-box-line')) {
-      // Add to cart
-      let cart = safeParseJSON('productsInCart');
-  cart.push({ name, price, img, quantity, size, id: Date.now() });
+  let cart = [];
+  try {
+    cart = JSON.parse(localStorage.getItem('productsInCart')) || [];
+  } catch (err) {
+    cart = [];
+  }
+  const parsedQty = parseInt(quantity) || 1;
+  const parsedSize = size ? size.replace('Size', '').trim() : 'M';
+
+  const existingItem = cart.find(
+    (p) => p.name === name && p.size === parsedSize
+  );
+  if (existingItem) {
+    existingItem.quantity += parsedQty;
+  } else {
+    cart.push({
+      name: name,
+      price:
+        typeof price === 'number'
+          ? price
+          : parseFloat(String(price).replace(/[₹$,\s]/g, '')),
+      image: img,
+      quantity: parsedQty,
+      size: parsedSize,
+    });
+  }
+
   localStorage.setItem('productsInCart', JSON.stringify(cart));
-  window.location.href = 'checkout.html';
+  if (typeof showToast === 'function') {
+    showToast(`${name} (Size: ${parsedSize}) added to cart!`, 'success');
+  }
+  if (typeof updateCartCount === 'function') {
+    updateCartCount();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -789,42 +841,41 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSearchSuggestions('');
 });
 
- // --- GLOBAL TOAST NOTIFICATION HANDLER ---
+// --- GLOBAL TOAST NOTIFICATION HANDLER ---
 function showToast(message, type = 'success') {
-    // Check if container already exists, else create it
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
+  // Check if container already exists, else create it
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
 
-    // Create Toast element wrapper
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
+  // Create Toast element wrapper
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
 
-    // Select icon based on variant types
-    let icon = '🛒';
-    if (type === 'error') icon = '❌';
-    if (type === 'warning') icon = '⚠️';
-    if (type === 'info') icon = 'ℹ️';
+  // Select icon based on variant types
+  let icon = '🛒';
+  if (type === 'error') icon = '❌';
+  if (type === 'warning') icon = '⚠️';
+  if (type === 'info') icon = 'ℹ️';
 
-    // Build Toast inner body to match your existing CSS layout (.toast-icon, .toast-msg, .toast-close, .toast-progress)
-    toast.innerHTML = `
+  // Build Toast inner body to match your existing CSS layout (.toast-icon, .toast-msg, .toast-close, .toast-progress)
+  toast.innerHTML = `
         <div class="toast-icon">${icon}</div>
         <div class="toast-msg">${message}</div>
         <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
         <div class="toast-progress"></div>
     `;
 
-    container.appendChild(toast);
+  container.appendChild(toast);
 
-    // Auto-remove animation sequence handling (Matches CSS timers smoothly)
+  // Auto-remove animation sequence handling (Matches CSS timers smoothly)
+  setTimeout(() => {
+    toast.classList.add('toast-hiding');
     setTimeout(() => {
-        toast.classList.add('toast-hiding');
-        setTimeout(() => {
-            toast.remove();
-        }, 350); // Exact exit duration specified in .toast-hiding cubic-bezier curve
-    }, 3650); // Active visibility shelf life before auto dismissal
+      toast.remove();
+    }, 350); // Exact exit duration specified in .toast-hiding cubic-bezier curve
+  }, 3650); // Active visibility shelf life before auto dismissal
 }
-
