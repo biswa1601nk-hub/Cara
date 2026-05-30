@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPass)) {
+      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(newPass)) {
         showToast(
           'Password must contain at least one special character (e.g. @, #, $).',
           'warning'

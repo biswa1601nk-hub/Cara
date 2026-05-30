@@ -16,6 +16,18 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        showToast: 'writable',
+        addToCart: 'writable',
+        buyNow: 'writable',
+        updateCartCount: 'writable',
+        loadCart: 'writable',
+        applyCoupon: 'writable',
+        Pose: 'readonly',
+        CaraToast: 'writable',
+        ThemeTransitionConfig: 'writable',
+        SkeletonLoader: 'writable',
+        ProductImageZoom: 'writable',
+        CSRFProtection: 'writable',
       },
     },
     plugins: {
