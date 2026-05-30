@@ -137,7 +137,13 @@ function formatCurrency(amount) {
 
 // Update cart count badge
 function updateCartCount() {
-    const cart       = JSON.parse(localStorage.getItem("productsInCart")) || [];
+    let cart = [];
+    try {
+        cart = JSON.parse(localStorage.getItem("productsInCart")) || [];
+    } catch (e) {
+        console.error("Error parsing cart data from localStorage:", e);
+        cart = [];
+    }
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     const desktopCount = document.getElementById("desktopCartCount");
@@ -157,7 +163,13 @@ document.addEventListener("DOMContentLoaded", updateCartCount);
 
 // Toggle empty-cart view
 function handleEmptyCartView() {
-    const cart           = JSON.parse(localStorage.getItem("productsInCart")) || [];
+    let cart = [];
+    try {
+        cart = JSON.parse(localStorage.getItem("productsInCart")) || [];
+    } catch (e) {
+        console.error("Error parsing cart data from localStorage:", e);
+        cart = [];
+    }
     const cartGrid       = document.getElementById("cart-container");
     const emptyContainer = document.getElementById("empty-cart-container");
 
