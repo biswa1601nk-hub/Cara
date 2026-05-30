@@ -23,7 +23,7 @@ document.addEventListener(
     const proCard = e.target.closest('.pro');
     if (!proCard) return;
 
-    if (e.target.closest('.cart') || e.target.closest('.buy-now-btn')) return;
+    if (e.target.closest(".cart") || e.target.closest(".buy-now-btn")) return;
 
     const nameElement = proCard.querySelector('h5');
     const priceElement = proCard.querySelector('h4');
@@ -173,7 +173,7 @@ function updateCartCount() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', updateCartCount);
+document.addEventListener("DOMContentLoaded", updateCartCount);
 
 // Toggle empty-cart view
 function handleEmptyCartView() {
@@ -277,18 +277,18 @@ function dismissToast(toast) {
 }
 
 window.updateQty = function (change) {
-  const qtyInput = document.getElementById('product-quantity');
-  if (!qtyInput) return;
+    const qtyInput = document.getElementById("product-quantity");
+    if (!qtyInput) return;
 
-  let currentValue = parseInt(qtyInput.value);
-  if (isNaN(currentValue)) currentValue = 1;
-  let newValue = Math.min(99, Math.max(1, currentValue + change));
-  qtyInput.value = newValue;
+    let currentValue = parseInt(qtyInput.value);
+    if (isNaN(currentValue)) currentValue = 1;
+    let newValue = Math.min(99, Math.max(1, currentValue + change));
+    qtyInput.value = newValue;
 
-  const minusBtn = document.querySelector('.qty-btn.minus');
-  const plusBtn = document.querySelector('.qty-btn.plus');
-  if (minusBtn) minusBtn.disabled = newValue <= 1;
-  if (plusBtn) plusBtn.disabled = newValue >= 99;
+    const minusBtn = document.querySelector(".qty-btn.minus");
+    const plusBtn  = document.querySelector(".qty-btn.plus");
+    if (minusBtn) minusBtn.disabled = (newValue <= 1);
+    if (plusBtn)  plusBtn.disabled  = (newValue >= 99);
 };
 
 window.handleAddToCart = function () {
@@ -1157,27 +1157,22 @@ window.shareWardrobe = function () {
 
     showToast('Wardrobe share link copied to clipboard!', 'success');
 
-    if (btn) {
-      var originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="ri-checkbox-circle-line"></i> Link Copied!';
-      btn.style.color = '#10b981';
-      setTimeout(function () {
-        btn.innerHTML = originalText;
-        btn.style.color = '';
-      }, 3000);
-    }
+        if (btn) {
+            var originalText   = btn.innerHTML;
+            btn.innerHTML      = '<i class="ri-checkbox-circle-line"></i> Link Copied!';
+            btn.style.color    = "#10b981";
+            setTimeout(function () { btn.innerHTML = originalText; btn.style.color = ""; }, 3000);
+        }
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(shareUrl).catch(function () {
-        fallbackCopyText(shareUrl);
-      });
-    } else {
-      fallbackCopyText(shareUrl);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl).catch(function () { fallbackCopyText(shareUrl); });
+        } else {
+            fallbackCopyText(shareUrl);
+        }
+    } catch (e) {
+        console.error("Failed to generate share link: ", e);
+        showToast("Oops, something went wrong generating the link.", "error");
     }
-  } catch (e) {
-    console.error('Failed to generate share link: ', e);
-    showToast('Oops, something went wrong generating the link.', 'error');
-  }
 };
 
 function fallbackCopyText(text) {

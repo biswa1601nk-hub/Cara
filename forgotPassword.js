@@ -24,11 +24,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* form submit */
   const form = document.getElementById('forgotForm');
-  if (form)
+  if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const email = document.getElementById('forgotEmail').value.trim();
+      const email = document
+        .getElementById('forgotEmail')
+        .value.trim()
+        .replace(/[<>"']/g, '');
+
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        showToast('Invalid email format.', 'warning');
+        return;
+      }
+
       const newPass = document.getElementById('forgotNewPass').value;
       const confirmPass = document.getElementById('forgotConfirmPass').value;
 
@@ -125,4 +134,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 2000);
       }, 1500);
     });
+  }
 });
